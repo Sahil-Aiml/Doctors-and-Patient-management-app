@@ -1,1 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Clinical Sanctuary | Enterprise Admin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#003d9b",
+                        "secondary": "#006b59",
+                        "surface": "#f8f9fb",
+                        "on-surface": "#191c1e"
+                    },
+                    fontFamily: {
+                        "headline": ["Manrope"],
+                        "body": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
 
+    <style>
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fb; color: #191c1e; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .view-section { display: none; }
+        .view-active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-link-active { background: #003d9b; color: white !important; border-radius: 999px 0 0 999px; border-left: 4px solid #b2c5ff; }
+    </style>
+</head>
+<body class="overflow-x-hidden">
+
+    <aside class="h-screen w-64 fixed left-0 top-0 bg-slate-900 flex flex-col py-8 z-50 shadow-2xl">
+        <div class="px-6 mb-10">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary flex items-center justify-center text-white shadow-lg">
+                    <span class="material-symbols-outlined">clinical_notes</span>
+                </div>
+                <div>
+                    <h1 class="text-lg font-extrabold text-white font-headline leading-none">Sanctuary</h1>
+                    <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Admin Pro</p>
+                </div>
+            </div>
+        </div>
+
+        <nav class="flex-1 space-y-1 pl-4">
+            <button onclick="switchView('dashboard')" id="nav-dashboard" class="nav-link w-full flex items-center gap-3 text-slate-400 py-3 px-6 hover:text-white transition-all">
+                <span class="material-symbols-outlined">dashboard</span> Dashboard
+            </button>
+            <button onclick="switchView('patients')" id="nav-patients" class="nav-link w-full flex items-center gap-3 text-slate-400 py-3 px-6 hover:text-white transition-all">
+                <span class="material-symbols-outlined">group</span> Patients
+            </button>
+            <button onclick="switchView('doctors')" id="nav-doctors" class="nav-link w-full flex items-center gap-3 text-slate-400 py-3 px-6 hover:text-white transition-all">
+                <span class="material-symbols-outlined">medical_services</span> Doctors
+            </button>
+        </nav>
+
+        <div class="px-6 mt-auto">
+            <div class="p-4 bg-white/5 rounded-2xl border border-white/10">
+                <p class="text-[10px] font-bold text-primary uppercase mb-1">System Health</p>
+                <div class="w-full bg-slate-800 h-1 rounded-full overflow-hidden">
+                    <div class="bg-primary w-3/4 h-full"></div>
+                </div>
+                <p class="text-[10px] text-slate-500 mt-2">Node: Jaipur-01 Online</p>
+            </div>
+        </div>
+    </aside>
+
+    <main class="ml-64 min-h-screen">
+        <header class="sticky top-0 z-40 h-16 bg-white/80 backdrop-blur-md border-b border-slate-100 flex justify-between items-center px-8">
+            <div class="relative w-full max-w-md">
+                <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">search</span>
+                <input class="w-full bg-slate-50 border-none rounded-full py-2 pl-10 pr-4 text-sm focus:ring-2 focus:ring-primary" placeholder="Search clinical records..." type="text"/>
+            </div>
+            <div class="flex items-center gap-6">
+                <button class="relative p-2 text-slate-500 hover:bg-slate-50 rounded-full transition-all">
+                    <span class="material-symbols-outlined">notifications</span>
+                    <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                </button>
+                <div class="flex items-center gap-3 pl-4 border-l border-slate-200">
+                    <div class="text-right">
+                        <p class="text-xs font-bold text-slate-900">Dr. Sahil Vance</p>
+                        <p class="text-[10px] text-slate-500">Chief Administrator</p>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-primary-fixed overflow-hidden ring-2 ring-primary/10">
+                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoviBsZgDBGzSRS5uE6_IIDsu_bUvGUSJDlGCEv76IVXxMpcAI2zOA7c_6KQa1fwYChNNaWNqmIwh2gBWrSIPjLBaF0RIiVwZlgW-dJ_QjZmCWZti-cA-0qn71F9bQR2IpV3ybLXk1flE7qHjynC1HLtVHN2_nRFTxdVBm4ZRsv2ZKgKe3Yh22pfUZRzIZWR3TWGb08-ii6FJ1aG6Fk8GrPpBk3X4ha4U7Fy_hG3P5Os018N9Q8ggOhaD4VsfTFkvK0junJ85NIgs" class="object-cover w-full h-full" />
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <section id="view-dashboard" class="view-section view-active p-10 max-w-7xl mx-auto">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <span class="text-primary font-bold text-xs uppercase tracking-widest block mb-2">Practice Summary</span>
+                    <h2 class="text-4xl font-extrabold font-headline tracking-tight">Clinical Sanctuary</h2>
+                </div>
+                <div class="flex gap-4">
+                    <button class="bg-slate-900 text-white px-6 py-3 rounded-xl font-bold text-sm shadow-xl hover:scale-105 active:scale-95 transition-all">Generate Report</button>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Patients</p>
+                    <h3 class="text-3xl font-black mt-2">3,428 <span class="text-xs text-green-500 font-bold">+12%</span></h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">On Duty</p>
+                    <h3 class="text-3xl font-black mt-2">42</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Appointments</p>
+                    <h3 class="text-3xl font-black mt-2">18 <span class="text-xs text-orange-500 font-bold italic">Busy</span></h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 border-l-4 border-l-red-500">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Pending Cases</p>
+                    <h3 class="text-3xl font-black mt-2 text-red-600">5</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                    <h4 class="text-xl font-bold font-headline mb-8">Patient Growth Trend</h4>
+                    <div class="relative h-64 w-full flex items-end justify-between gap-4">
+                        <div class="flex-1 bg-primary/10 rounded-t-xl h-[40%] hover:bg-primary/20 transition-all"></div>
+                        <div class="flex-1 bg-primary/10 rounded-t-xl h-[65%] hover:bg-primary/20 transition-all"></div>
+                        <div class="flex-1 bg-primary rounded-t-xl h-[85%] shadow-lg shadow-primary/20"></div>
+                        <div class="flex-1 bg-primary/10 rounded-t-xl h-[70%] hover:bg-primary/20 transition-all"></div>
+                        <div class="flex-1 bg-primary/10 rounded-t-xl h-[95%] hover:bg-primary/20 transition-all"></div>
+                        <div class="flex-1 bg-primary/10 rounded-t-xl h-[75%] hover:bg-primary/20 transition-all"></div>
+                    </div>
+                </div>
+                <div class="bg-white rounded-3xl p-8 shadow-sm border border-slate-100">
+                    <h4 class="text-xl font-bold font-headline mb-6">Live Feed</h4>
+                    <div class="space-y-6">
+                        <div class="flex gap-3">
+                            <div class="w-2 h-2 rounded-full bg-green-500 mt-2"></div>
+                            <div>
+                                <p class="text-sm font-bold">Dr. Jenkins joined</p>
+                                <p class="text-[10px] text-slate-500">Cardiology Wing • 14m ago</p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-2 h-2 rounded-full bg-blue-500 mt-2"></div>
+                            <div>
+                                <p class="text-sm font-bold">Lab Results Sync</p>
+                                <p class="text-[10px] text-slate-500">Unit 04 • 2h ago</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="view-patients" class="view-section p-10 max-w-7xl mx-auto">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-4xl font-extrabold font-headline text-primary tracking-tight">Patient Management</h2>
+                    <p class="text-slate-500 mt-2">Full access to clinical records and history.</p>
+                </div>
+                <button class="bg-primary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                    <span class="material-symbols-outlined">person_add</span> Add New Patient
+                </button>
+            </div>
+
+            <div class="bg-white rounded-2xl overflow-hidden shadow-sm border border-slate-100">
+                <table class="w-full border-collapse text-left">
+                    <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-500">
+                        <tr>
+                            <th class="px-6 py-4">Patient Name</th>
+                            <th class="px-6 py-4">Age / Gender</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-blue-100 overflow-hidden">
+                                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD4AMleYZGLI8ix3XgCVfrpIgzKBMN7nRBk3hicUDZ52yKHklMcqwgv7ziZhXIcCUnnDk4gQBoH5lu5txMEMiEJCmVBmh4rrJTBPk3FvfN4IPszQg7ws2AAH7F9dpUlqmKHq3LefS-7M0KPNeusfnbuwsDzScp7mx8knwbVqiwzH2Q9bUslVNA5_ufJsjMmWjRMqqXrSFrL_fTl3b-84s2d-g83ZmD1z7XZJaoJP5cjKtXfNIrVwPtTZ8Oc0TbZVyf5XPv49I6_UmE" />
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-sm">Eleanor Vance</p>
+                                        <p class="text-[10px] text-slate-400">#CS-90210</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5 text-sm">68 Yrs / Female</td>
+                            <td class="px-6 py-5"><span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold">ACTIVE</span></td>
+                            <td class="px-6 py-5 text-right"><button class="text-primary font-bold text-xs uppercase tracking-widest">Chart</button></td>
+                        </tr>
+                        <tr class="hover:bg-slate-50 transition-colors">
+                            <td class="px-6 py-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full bg-slate-100 overflow-hidden">
+                                        <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDscVGAftxJY9pEexNBAHnycg-_3xj-vGa8M11HYBjakjW53zF-v6MoVd4PIjpLHVYWLEZ1ViXUrGPb9ANQcVb9ydjDLQ1D0Hbqdh0xMBc29aNhSosOhnnXuwrKE9pN06xM3MEhRjCHBbuew3jF-RSZxDhD_JhjHgiVrSMPxKAvYkzn8R7oIwmLnA5R5nCx8OCGcvd1U3zgWhDQudVSrv9ewuJgufK86vAJfNmRp4RMJz11set2MrBM8f_eIJ2OIZ8ywNBcWyWRfAA" />
+                                    </div>
+                                    <div>
+                                        <p class="font-bold text-sm">Marcus Thorne</p>
+                                        <p class="text-[10px] text-slate-400">#CS-88122</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-5 text-sm">34 Yrs / Male</td>
+                            <td class="px-6 py-5"><span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded-full font-bold">INACTIVE</span></td>
+                            <td class="px-6 py-5 text-right"><button class="text-primary font-bold text-xs uppercase tracking-widest">Chart</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="view-doctors" class="view-section p-10 max-w-7xl mx-auto">
+            <h2 class="text-4xl font-extrabold font-headline mb-8">Staff Directory</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm group hover:scale-105 transition-all">
+                    <div class="flex gap-5 mb-6">
+                        <img class="w-20 h-20 rounded-2xl object-cover ring-4 ring-slate-50" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAzPZWGcR1USm9LE88VLQlbrLpVfeYq7axe8f_-CKf0eIcWdb9GiRqQKD1Rmik4DhCeFPEdhTV8wfg6ZddWdB_Q11xHX3DRcT3PCMxO6cvHCYcmLALoqSwB4TTOji_dXno2pDh_CKPmYalusXpXiN1Vou8e7jGyhEc0YQnIzKJk-BBX0ce8sYuin7BRmH7wT4w1GofvOCKh-9XLnGAUhDw14js_YxfGXdUu1jXxCVGezCLe5WnimjbYojOJtuxGXGz_E4RxQRULSAY" />
+                        <div class="flex flex-col justify-center">
+                            <span class="bg-green-100 text-green-700 text-[10px] px-2 py-0.5 rounded-full font-bold w-fit">ACTIVE</span>
+                            <h3 class="text-xl font-bold mt-1">Dr. Sarah Jenkins</h3>
+                            <p class="text-primary text-xs font-bold uppercase tracking-widest">Senior Cardiologist</p>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 text-center">
+                        <div class="bg-slate-50 p-3 rounded-2xl">
+                            <p class="text-[10px] font-bold text-slate-400">Experience</p>
+                            <p class="font-bold">14 Years</p>
+                        </div>
+                        <div class="bg-slate-50 p-3 rounded-2xl">
+                            <p class="text-[10px] font-bold text-slate-400">Patients</p>
+                            <p class="font-bold">1,240+</p>
+                        </div>
+                    </div>
+                    <button class="w-full mt-6 bg-slate-900 text-white py-3 rounded-xl font-bold text-xs hover:bg-primary transition-all">Book Appointment</button>
+                </div>
+            </div>
+
+            <div class="mt-12 bg-white rounded-2xl overflow-hidden border border-slate-100 shadow-sm">
+                <div class="px-6 py-4 bg-slate-50 border-b border-slate-100">
+                    <h4 class="font-bold text-sm uppercase tracking-widest">Recent Staff Activity</h4>
+                </div>
+                <table class="w-full text-left">
+                    <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50 transition-all">
+                            <td class="px-6 py-4 text-sm font-bold">Dr. Michael Chen</td>
+                            <td class="px-6 py-4"><span class="bg-orange-100 text-orange-600 text-[10px] px-2 py-1 rounded-full font-bold">IN SURGERY</span></td>
+                            <td class="px-6 py-4 text-xs text-slate-500 font-medium italic">Emergency Consult #412</td>
+                            <td class="px-6 py-4 text-right"><button class="text-slate-400 hover:text-primary"><span class="material-symbols-outlined">more_horiz</span></button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        function switchView(viewId) {
+            // Hide all sections
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.classList.remove('view-active');
+            });
+            // Show requested section
+            document.getElementById('view-' + viewId).classList.add('view-active');
+
+            // Reset navigation styles
+            document.querySelectorAll('.nav-link').forEach(link => {
+                link.classList.remove('nav-link-active');
+            });
+            // Highlight active link
+            document.getElementById('nav-' + viewId).classList.add('nav-link-active');
+        }
+
+        // Initialize with Dashboard View
+        switchView('dashboard');
+    </script>
+</body>
+</html>
