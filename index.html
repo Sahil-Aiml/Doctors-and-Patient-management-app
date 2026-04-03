@@ -1,187 +1,169 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMD Slingshot | MedPulse AI Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Clinical Sanctuary | Enterprise Management</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
-        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
-        .critical-glow { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); border-left: 4px solid #ef4444 !important; }
-        .gradient-bg { background: linear-gradient(135deg, #22c55e 0%, #3b82f6 100%); }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8f9fb; }
+        .font-headline { font-family: 'Manrope', sans-serif; }
+        .nav-active { background: #003d9b; color: white !important; border-radius: 0.75rem; }
+        .page-content { display: none; }
+        .page-active { display: block; }
     </style>
 </head>
-<body class="min-h-screen p-4 md:p-8">
+<body class="bg-background text-on-surface">
 
-    <div class="max-w-6xl mx-auto">
-        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+    <aside class="h-screen w-64 fixed left-0 top-0 bg-slate-900 flex flex-col py-8 z-50 text-slate-300">
+        <div class="px-6 mb-10 flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center text-white">
+                <span class="material-symbols-outlined">clinical_notes</span>
+            </div>
             <div>
-                <h1 class="text-4xl font-extrabold tracking-tight">MedPulse <span class="text-green-500 underline decoration-blue-500">AI</span></h1>
-                <p class="text-slate-400 mt-1">AMD Slingshot Advanced Patient Management System</p>
-            </div>
-            <div class="flex gap-3">
-                <div class="glass px-4 py-2 rounded-lg text-sm font-mono" id="live-clock">00:00:00</div>
-                <button onclick="exportData()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm transition">Export CSV</button>
-            </div>
-        </header>
-
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-            <div class="glass p-5 rounded-2xl">
-                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Queue</p>
-                <h2 id="stat-total" class="text-3xl font-bold mt-2">0</h2>
-            </div>
-            <div class="glass p-5 rounded-2xl border-b-4 border-red-500">
-                <p class="text-red-400 text-xs font-bold uppercase tracking-widest">Critical Alert</p>
-                <h2 id="stat-critical" class="text-3xl font-bold mt-2">0</h2>
-            </div>
-            <div class="glass p-5 rounded-2xl border-b-4 border-blue-500">
-                <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">Wait Time</p>
-                <h2 class="text-3xl font-bold mt-2">~12m</h2>
-            </div>
-            <div class="glass p-5 rounded-2xl border-b-4 border-green-500">
-                <p class="text-green-400 text-xs font-bold uppercase tracking-widest">AMD Node Status</p>
-                <h2 class="text-3xl font-bold mt-2 text-green-400">Online</h2>
+                <h1 class="text-lg font-bold text-white font-headline">Clinical</h1>
+                <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Admin Pro</p>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-            <div class="lg:col-span-4">
-                <div class="glass p-6 rounded-3xl sticky top-8">
-                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
-                        <i class="fa-solid fa-hospital-user text-green-500"></i> Patient Intake
-                    </h3>
-                    <div class="space-y-5">
-                        <div>
-                            <label class="text-xs font-semibold text-slate-400 uppercase">Patient Full Name</label>
-                            <input id="p-name" type="text" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-3 mt-1 focus:ring-2 focus:ring-green-500 outline-none transition" placeholder="Enter name...">
-                        </div>
-                        <div>
-                            <label class="text-xs font-semibold text-slate-400 uppercase">Symptom Description</label>
-                            <textarea id="p-symptom" rows="4" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-3 mt-1 focus:ring-2 focus:ring-green-500 outline-none transition" placeholder="E.g. Chest pain, high fever, dizziness..."></textarea>
-                        </div>
-                        <button onclick="processPatient()" class="w-full gradient-bg text-white font-bold py-4 rounded-xl shadow-lg shadow-green-500/20 hover:scale-[1.02] active:scale-95 transition-all">
-                            GENERATE AI TRIAGE
-                        </button>
-                    </div>
-                </div>
-            </div>
+        <nav class="flex-1 px-4 space-y-2">
+            <button onclick="showPage('dashboard')" id="btn-dashboard" class="nav-item w-full flex items-center gap-3 py-3 px-4 hover:bg-slate-800 rounded-xl transition-all">
+                <span class="material-symbols-outlined">dashboard</span> Dashboard
+            </button>
+            <button onclick="showPage('patients')" id="btn-patients" class="nav-item w-full flex items-center gap-3 py-3 px-4 hover:bg-slate-800 rounded-xl transition-all">
+                <span class="material-symbols-outlined">group</span> Patients
+            </button>
+            <button onclick="showPage('doctors')" id="btn-doctors" class="nav-item w-full flex items-center gap-3 py-3 px-4 hover:bg-slate-800 rounded-xl transition-all">
+                <span class="material-symbols-outlined">medical_services</span> Doctors
+            </button>
+        </nav>
 
-            <div class="lg:col-span-8">
-                <div class="flex justify-between items-end mb-4">
-                    <h3 class="text-xl font-bold">Live Management Queue</h3>
-                    <p id="queue-count" class="text-sm text-slate-400">Showing 0 patients</p>
-                </div>
-                <div id="queue-container" class="space-y-4">
-                    <div id="empty-state" class="text-center py-20 border-2 border-dashed border-slate-800 rounded-3xl">
-                        <i class="fa-solid fa-layer-group text-4xl text-slate-700 mb-4"></i>
-                        <p class="text-slate-500">No active patients in triage.</p>
-                    </div>
+        <div class="px-6 mt-auto pt-6 border-t border-slate-800">
+            <div class="flex items-center gap-3 p-2">
+                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-xs font-bold text-white">SA</div>
+                <div class="overflow-hidden">
+                    <p class="text-xs font-bold text-white truncate">Sahil Admin</p>
+                    <p class="text-[10px] text-slate-500">System Lead</p>
                 </div>
             </div>
         </div>
-    </div>
+    </aside>
+
+    <main class="ml-64 min-h-screen">
+        
+        <section id="page-dashboard" class="page-content page-active p-10">
+            <div class="flex justify-between items-end mb-10">
+                <div>
+                    <h2 class="text-3xl font-extrabold font-headline tracking-tight">Executive Summary</h2>
+                    <p class="text-slate-500">Welcome back. Here is your practice overview.</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Patients</p>
+                    <h3 class="text-3xl font-black mt-2">1,284</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">On-Duty Doctors</p>
+                    <h3 class="text-3xl font-black mt-2 text-blue-600">42</h3>
+                </div>
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Active Cases</p>
+                    <h3 class="text-3xl font-black mt-2 text-green-600">18</h3>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-slate-100">
+                <h4 class="font-bold mb-4">Patient Growth Analytics</h4>
+                <div class="h-48 w-full bg-slate-50 rounded-xl flex items-end justify-around p-4">
+                    <div class="w-12 bg-blue-200 rounded-t-lg h-[30%]"></div>
+                    <div class="w-12 bg-blue-300 rounded-t-lg h-[50%]"></div>
+                    <div class="w-12 bg-blue-600 rounded-t-lg h-[90%]"></div>
+                    <div class="w-12 bg-blue-400 rounded-t-lg h-[70%]"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-patients" class="page-content p-10">
+            <h2 class="text-3xl font-extrabold font-headline mb-6">Patient Management</h2>
+            <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-slate-100">
+                <table class="w-full text-left">
+                    <thead class="bg-slate-50 text-[10px] uppercase font-bold text-slate-500">
+                        <tr>
+                            <th class="px-6 py-4">Name</th>
+                            <th class="px-6 py-4">Status</th>
+                            <th class="px-6 py-4">Last Visit</th>
+                            <th class="px-6 py-4 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-4 font-bold text-blue-900 text-sm">Eleanor Vance</td>
+                            <td class="px-6 py-4"><span class="bg-green-100 text-green-700 text-[10px] px-2 py-1 rounded-full font-bold">ACTIVE</span></td>
+                            <td class="px-6 py-4 text-xs">Oct 24, 2025</td>
+                            <td class="px-6 py-4 text-right"><button class="text-blue-600 text-xs font-bold">View</button></td>
+                        </tr>
+                        <tr class="hover:bg-slate-50">
+                            <td class="px-6 py-4 font-bold text-blue-900 text-sm">Marcus Thorne</td>
+                            <td class="px-6 py-4"><span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-1 rounded-full font-bold">INACTIVE</span></td>
+                            <td class="px-6 py-4 text-xs">Sep 12, 2025</td>
+                            <td class="px-6 py-4 text-right"><button class="text-blue-600 text-xs font-bold">View</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section id="page-doctors" class="page-content p-10">
+            <h2 class="text-3xl font-extrabold font-headline mb-8">Doctor Directory</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                    <div class="flex gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-xl bg-blue-100 flex items-center justify-center text-blue-600 font-bold">SJ</div>
+                        <div>
+                            <h3 class="font-bold text-lg">Dr. Sarah Jenkins</h3>
+                            <p class="text-xs text-blue-600 font-medium">Cardiology</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">14 Years Experience | 1.2k+ Patients</p>
+                    <button class="w-full bg-slate-100 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">View Schedule</button>
+                </div>
+                <div class="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-md transition-all">
+                    <div class="flex gap-4 mb-4">
+                        <div class="w-16 h-16 rounded-xl bg-orange-100 flex items-center justify-center text-orange-600 font-bold">MC</div>
+                        <div>
+                            <h3 class="font-bold text-lg">Dr. Michael Chen</h3>
+                            <p class="text-xs text-orange-600 font-medium">Neuroscience</p>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 mb-4">22 Years Experience | 3.1k+ Patients</p>
+                    <button class="w-full bg-slate-100 py-2 rounded-lg text-xs font-bold hover:bg-blue-600 hover:text-white transition-all">View Schedule</button>
+                </div>
+            </div>
+        </section>
+
+    </main>
 
     <script>
-        let patients = JSON.parse(localStorage.getItem('medpulse_db')) || [];
-
-        function updateClock() {
-            document.getElementById('live-clock').innerText = new Date().toLocaleTimeString();
-        }
-        setInterval(updateClock, 1000);
-
-        function analyzeSymptoms(text) {
-            const input = text.toLowerCase();
-            if (input.includes('chest') || input.includes('heart') || input.includes('breath')) 
-                return { level: 'CRITICAL', score: 3, color: 'bg-red-500', dept: 'Cardiology' };
-            if (input.includes('fever') || input.includes('pain') || input.includes('stomach')) 
-                return { level: 'HIGH', score: 2, color: 'bg-orange-500', dept: 'Internal Medicine' };
-            return { level: 'STABLE', score: 1, color: 'bg-blue-500', dept: 'General OPD' };
-        }
-
-        function processPatient() {
-            const name = document.getElementById('p-name').value;
-            const symptom = document.getElementById('p-symptom').value;
-
-            if(!name || !symptom) return alert("Please complete the intake form.");
-
-            const triage = analyzeSymptoms(symptom);
-            const patient = {
-                id: Date.now(),
-                name,
-                symptom,
-                triage,
-                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
-            };
-
-            patients.push(patient);
-            saveAndRefresh();
+        function showPage(pageId) {
+            // Hide all pages
+            document.querySelectorAll('.page-content').forEach(p => p.classList.remove('page-active'));
+            // Remove active class from all buttons
+            document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('nav-active'));
             
-            document.getElementById('p-name').value = '';
-            document.getElementById('p-symptom').value = '';
+            // Show current page
+            document.getElementById('page-' + pageId).classList.add('page-active');
+            // Set active button
+            document.getElementById('btn-' + pageId).classList.add('nav-active');
         }
 
-        function deletePatient(id) {
-            patients = patients.filter(p => p.id !== id);
-            saveAndRefresh();
-        }
-
-        function saveAndRefresh() {
-            // AMD-Optimized Sort: High priority first
-            patients.sort((a, b) => b.triage.score - a.triage.score);
-            localStorage.setItem('medpulse_db', JSON.stringify(patients));
-            render();
-        }
-
-        function render() {
-            const container = document.getElementById('queue-container');
-            const empty = document.getElementById('empty-state');
-            const totalStat = document.getElementById('stat-total');
-            const critStat = document.getElementById('stat-critical');
-            
-            container.innerHTML = '';
-            let critCount = 0;
-
-            if(patients.length === 0) {
-                container.appendChild(empty);
-            } else {
-                patients.forEach(p => {
-                    if(p.triage.level === 'CRITICAL') critCount++;
-                    const card = document.createElement('div');
-                    card.className = `glass p-5 rounded-2xl flex justify-between items-center group transition-all hover:bg-slate-800/80 ${p.triage.level === 'CRITICAL' ? 'critical-glow' : ''}`;
-                    card.innerHTML = `
-                        <div class="flex flex-col gap-1">
-                            <div class="flex items-center gap-3">
-                                <span class="font-bold text-lg">${p.name}</span>
-                                <span class="${p.triage.color} text-[10px] font-black px-2 py-0.5 rounded text-white uppercase">${p.triage.level}</span>
-                            </div>
-                            <p class="text-slate-400 text-sm italic">"${p.symptom}"</p>
-                            <div class="flex gap-4 mt-2">
-                                <span class="text-[10px] text-slate-500 uppercase font-bold"><i class="fa-solid fa-stethoscope mr-1"></i> ${p.triage.dept}</span>
-                                <span class="text-[10px] text-slate-500 uppercase font-bold"><i class="fa-solid fa-clock mr-1"></i> ${p.time}</span>
-                            </div>
-                        </div>
-                        <button onclick="deletePatient(${p.id})" class="opacity-0 group-hover:opacity-100 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white p-3 rounded-xl transition-all">
-                            <i class="fa-solid fa-check"></i>
-                        </button>
-                    `;
-                    container.appendChild(card);
-                });
-            }
-
-            totalStat.innerText = patients.length;
-            critStat.innerText = critCount;
-            document.getElementById('queue-count').innerText = `Active Queue: ${patients.length}`;
-        }
-
-        function exportData() {
-            alert("Data exported to console for AMD analytics node.");
-            console.log(JSON.stringify(patients, null, 2));
-        }
-
-        render();
+        // Initialize with dashboard
+        showPage('dashboard');
     </script>
 </body>
 </html>
