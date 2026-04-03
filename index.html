@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AMD Slingshot | MedPulse AI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
+        .critical-glow { box-shadow: 0 0 15px rgba(239, 68, 68, 0.3); border-left: 4px solid #ef4444 !important; }
+        .gradient-bg { background: linear-gradient(135deg, #22c55e 0%, #3b82f6 100%); }
+    </style>
+</head>
+<body class="min-h-screen p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+            <div>
+                <h1 class="text-4xl font-extrabold tracking-tight">MedPulse <span class="text-green-500 underline decoration-blue-500">AI</span></h1>
+                <p class="text-slate-400 mt-1">AMD Slingshot Advanced Patient Management System</p>
+            </div>
+            <div class="flex gap-3">
+                <div class="glass px-4 py-2 rounded-lg text-sm font-mono" id="live-clock">00:00:00</div>
+                <button onclick="exportData()" class="bg-slate-700 hover:bg-slate-600 px-4 py-2 rounded-lg text-sm transition">Export CSV</button>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="glass p-5 rounded-2xl">
+                <p class="text-slate-400 text-xs font-bold uppercase tracking-widest">Total Queue</p>
+                <h2 id="stat-total" class="text-3xl font-bold mt-2">0</h2>
+            </div>
+            <div class="glass p-5 rounded-2xl border-b-4 border-red-500">
+                <p class="text-red-400 text-xs font-bold uppercase tracking-widest">Critical Alert</p>
+                <h2 id="stat-critical" class="text-3xl font-bold mt-2">0</h2>
+            </div>
+            <div class="glass p-5 rounded-2xl border-b-4 border-blue-500">
+                <p class="text-blue-400 text-xs font-bold uppercase tracking-widest">Wait Time</p>
+                <h2 class="text-3xl font-bold mt-2">~12m</h2>
+            </div>
+            <div class="glass p-5 rounded-2xl border-b-4 border-green-500">
+                <p class="text-green-400 text-xs font-bold uppercase tracking-widest">AMD Node Status</p>
+                <h2 class="text-3xl font-bold mt-2 text-green-400">Online</h2>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            <div class="lg:col-span-4">
+                <div class="glass p-6 rounded-3xl sticky top-8">
+                    <h3 class="text-xl font-bold mb-6 flex items-center gap-2">
+                        <i class="fa-solid fa-hospital-user text-green-500"></i> Patient Intake
+                    </h3>
+                    <div class="space-y-5">
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 uppercase">Patient Full Name</label>
+                            <input id="p-name" type="text" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-3 mt-1 focus:ring-2 focus:ring-green-500 outline-none transition" placeholder="Enter name...">
+                        </div>
+                        <div>
+                            <label class="text-xs font-semibold text-slate-400 uppercase">Symptom Description</label>
+                            <textarea id="p-symptom" rows="4" class="w-full bg-slate-900/50 border border-slate-700 rounded-xl p-3 mt-1 focus:ring-2 focus:ring-green-500 outline-none transition" placeholder="E.g. Chest pain, high fever, dizziness..."></textarea>
+                        </div>
+                        <button onclick="processPatient()" class="w-full gradient-bg text-white font-bold py-4 rounded-xl shadow-lg shadow-green-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                            GENERATE AI TRIAGE
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-8">
+                <div class="flex justify-between items-end mb-4">
+                    <h3 class="text-xl font-bold">Live Management Queue</h3>
+                    <p id="queue-count" class="text-sm text-slate-400">Showing 0 patients</p>
+                </div>
+                <div id="queue-container" class="space-y-4">
+                    <div id="empty-state" class="text-center py-20 border-2 border-dashed border-slate-800 rounded-3xl">
+                        <i class="fa-solid fa-layer-group text-4xl text-slate-700 mb-4"></i>
+                        <p class="text-slate-500">No active patients in triage.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let patients = JSON.parse(localStorage.getItem('medpulse_db')) || [];
+
+        function updateClock() {
+            document.getElementById('live-clock').innerText = new Date().toLocaleTimeString();
+        }
+        setInterval(updateClock, 1000);
+
+        function analyzeSymptoms(text) {
+            const input = text.toLowerCase();
+            if (input.includes('chest') || input.includes('heart') || input.includes('breath')) 
+                return { level: 'CRITICAL', score: 3, color: 'bg-red-500', dept: 'Cardiology' };
+            if (input.includes('fever') || input.includes('pain') || input.includes('stomach')) 
+                return { level: 'HIGH', score: 2, color: 'bg-orange-500', dept: 'Internal Medicine' };
+            return { level: 'STABLE', score: 1, color: 'bg-blue-500', dept: 'General OPD' };
+        }
+
+        function processPatient() {
+            const name = document.getElementById('p-name').value;
+            const symptom = document.getElementById('p-symptom').value;
+
+            if(!name || !symptom) return alert("Please complete the intake form.");
+
+            const triage = analyzeSymptoms(symptom);
+            const patient = {
+                id: Date.now(),
+                name,
+                symptom,
+                triage,
+                time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+            };
+
+            patients.push(patient);
+            saveAndRefresh();
+            
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-symptom').value = '';
+        }
+
+        function deletePatient(id) {
+            patients = patients.filter(p => p.id !== id);
+            saveAndRefresh();
+        }
+
+        function saveAndRefresh() {
+            // AMD-Optimized Sort: High priority first
+            patients.sort((a, b) => b.triage.score - a.triage.score);
+            localStorage.setItem('medpulse_db', JSON.stringify(patients));
+            render();
+        }
+
+        function render() {
+            const container = document.getElementById('queue-container');
+            const empty = document.getElementById('empty-state');
+            const totalStat = document.getElementById('stat-total');
+            const critStat = document.getElementById('stat-critical');
+            
+            container.innerHTML = '';
+            let critCount = 0;
+
+            if(patients.length === 0) {
+                container.appendChild(empty);
+            } else {
+                patients.forEach(p => {
+                    if(p.triage.level === 'CRITICAL') critCount++;
+                    const card = document.createElement('div');
+                    card.className = `glass p-5 rounded-2xl flex justify-between items-center group transition-all hover:bg-slate-800/80 ${p.triage.level === 'CRITICAL' ? 'critical-glow' : ''}`;
+                    card.innerHTML = `
+                        <div class="flex flex-col gap-1">
+                            <div class="flex items-center gap-3">
+                                <span class="font-bold text-lg">${p.name}</span>
+                                <span class="${p.triage.color} text-[10px] font-black px-2 py-0.5 rounded text-white uppercase">${p.triage.level}</span>
+                            </div>
+                            <p class="text-slate-400 text-sm italic">"${p.symptom}"</p>
+                            <div class="flex gap-4 mt-2">
+                                <span class="text-[10px] text-slate-500 uppercase font-bold"><i class="fa-solid fa-stethoscope mr-1"></i> ${p.triage.dept}</span>
+                                <span class="text-[10px] text-slate-500 uppercase font-bold"><i class="fa-solid fa-clock mr-1"></i> ${p.time}</span>
+                            </div>
+                        </div>
+                        <button onclick="deletePatient(${p.id})" class="opacity-0 group-hover:opacity-100 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white p-3 rounded-xl transition-all">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            totalStat.innerText = patients.length;
+            critStat.innerText = critCount;
+            document.getElementById('queue-count').innerText = `Active Queue: ${patients.length}`;
+        }
+
+        function exportData() {
+            alert("Data exported to console for AMD analytics node.");
+            console.log(JSON.stringify(patients, null, 2));
+        }
+
+        render();
+    </script>
+</body>
+</html>
